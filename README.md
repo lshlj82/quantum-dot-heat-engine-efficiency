@@ -10,7 +10,7 @@ This demo was created by **Claude Opus 5.5** (Anthropic).
 
 ## What the demo shows
 
-- **Energy diagram.** The hot lead, the cold lead, and the dot level at the current optimum, with electrons animated at a rate proportional to the particle current.
+- **Energy diagram with a live simulation.** The hot and cold leads (their Fermi edges smeared in proportion to temperature) and the dot level at the current optimum. Electrons hop at their actual tunnelling rates, drawn from a stochastic (Gillespie) simulation of the master equation, Eq. (2), including backward hops. Brackets show the energy bookkeeping per electron: heat <i>Q</i><sub>1</sub> = <i>E</i><sub>QD</sub> absorbed from the hot lead, heat <i>Q</i><sub>2</sub> = <i>E</i><sub>QD</sub> − Δμ released to the cold lead, and work <i>W</i> = Δμ. Live counters compare the simulated current, power, and efficiency with the exact values, and the speed can be set to 1×, 10×, or 100×.
 - **Efficiency at maximum power against η<sub>C</sub>.** Three optimization schemes are shown together with η<sub>C</sub>, η<sub>C</sub>/2, and the Curzon–Ahlborn efficiency:
   - *Gate and bias* is the global optimization over both <i>E</i><sub>QD</sub> and Δμ (Sec. III, Eq. 18).
   - *Bias only* fixes <i>E</i><sub>QD</sub> and varies Δμ (Sec. IV, Eq. 22).
@@ -38,6 +38,15 @@ All optima are found numerically in the browser. The code works with log W for n
 - <i>q</i>* → 0.0832 as η<sub>C</sub> → 0 and <i>q</i>* → 0.2178 as η<sub>C</sub> → 1.
 - The expansions in Eqs. 18, 22, and 40 at small η<sub>C</sub>.
 - About 33% higher efficiency and about 71% of the global maximum power for gate-only tuning at η<sub>C</sub> = 0.3 and Δμ = <i>T</i><sub>2</sub>. The paper quotes roughly 30% and 70% in Sec. V C.
+
+## Running it
+
+It is one self-contained file with no build step and no dependencies. The only external request is to Google Fonts, and fallback fonts are used if it fails.
+
+- **Locally:** open `index.html` in any modern browser.
+- **GitHub Pages:** push the repository, then go to *Settings → Pages* and choose *Deploy from a branch*, selecting the branch and `/ (root)`. The demo will be served at `https://<user>.github.io/<repo>/`.
+
+The page adapts to light and dark mode, works on mobile, and respects the reduced-motion setting.
 
 ## Files
 
