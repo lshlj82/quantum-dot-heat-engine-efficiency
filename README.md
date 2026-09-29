@@ -10,7 +10,7 @@ This demo was created by **Claude Opus 5.5** (Anthropic).
 
 ## What the demo shows
 
-- **Energy diagram with a live simulation.** The hot and cold leads (their Fermi edges smeared in proportion to temperature) and the dot level at the current optimum. Electrons hop at their actual tunnelling rates, drawn from a stochastic (Gillespie) simulation of the master equation, Eq. (2), including backward hops. Brackets show the energy bookkeeping per electron: heat <i>Q</i><sub>1</sub> = <i>E</i><sub>QD</sub> absorbed from the hot lead, heat <i>Q</i><sub>2</sub> = <i>E</i><sub>QD</sub> − Δμ released to the cold lead, and work <i>W</i> = Δμ. Live counters compare the simulated current, power, and efficiency with the exact values, and the speed can be set to 1×, 10×, or 100×.
+- **Energy diagram with a live simulation.** The hot and cold leads (their Fermi edges smeared in proportion to temperature) and the dot level at the current optimum. Electrons hop at their actual tunneling rates, drawn from a stochastic (Gillespie) simulation of the master equation, Eq. (2), including backward hops. Brackets show the energy bookkeeping per electron: heat <i>Q</i><sub>1</sub> = <i>E</i><sub>QD</sub> absorbed from the hot lead, heat <i>Q</i><sub>2</sub> = <i>E</i><sub>QD</sub> − Δμ released to the cold lead, and work <i>W</i> = Δμ. Live counters compare the simulated current, power, and efficiency with the exact values, and the speed can be set to 1×, 10×, or 100×.
 - **Efficiency at maximum power against η<sub>C</sub>.** Three optimization schemes are shown together with η<sub>C</sub>, η<sub>C</sub>/2, and the Curzon–Ahlborn efficiency:
   - *Gate and bias* is the global optimization over both <i>E</i><sub>QD</sub> and Δμ (Sec. III, Eq. 18).
   - *Bias only* fixes <i>E</i><sub>QD</sub> and varies Δμ (Sec. IV, Eq. 22).
@@ -23,7 +23,7 @@ This demo was created by **Claude Opus 5.5** (Anthropic).
 
 ## Model
 
-Units are <i>k</i><sub>B</sub> = 1 and <i>T</i><sub>2</sub> = 1, with <i>T</i><sub>1</sub> = <i>T</i><sub>2</sub>/(1 − η<sub>C</sub>). Tunnelling rates are normalized so that q + q̃ = ε + ε̃ = 1. The power is
+Units are <i>k</i><sub>B</sub> = 1 and <i>T</i><sub>2</sub> = 1, with <i>T</i><sub>1</sub> = <i>T</i><sub>2</sub>/(1 − η<sub>C</sub>). tunneling rates are normalized so that q + q̃ = ε + ε̃ = 1. The power is
 
 $$
 \dot W = \tfrac{1}{2}(q-\epsilon)\,\Delta\mu, \qquad
