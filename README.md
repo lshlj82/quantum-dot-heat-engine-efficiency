@@ -39,15 +39,6 @@ All optima are found numerically in the browser. The code works with log W for n
 - The expansions in Eqs. 18, 22, and 40 at small η<sub>C</sub>.
 - About 33% higher efficiency and about 71% of the global maximum power for gate-only tuning at η<sub>C</sub> = 0.3 and Δμ = <i>T</i><sub>2</sub>. The paper quotes roughly 30% and 70% in Sec. V C.
 
-## Running it
-
-It is one self-contained file with no build step and no dependencies. The only external request is to Google Fonts, and fallback fonts are used if it fails.
-
-- **Locally:** open `index.html` in any modern browser.
-- **GitHub Pages:** push the repository, then go to *Settings → Pages* and choose *Deploy from a branch*, selecting the branch and `/ (root)`. The demo will be served at `https://<user>.github.io/<repo>/`.
-
-The page adapts to light and dark mode, works on mobile, and respects the reduced-motion setting.
-
 ## Files
 
 | File | Purpose |
