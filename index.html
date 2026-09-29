@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quantum dot heat engine: efficiency at maximum power</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF0F4; --panel:#E1E6EE; --paper:#F8F9FB; --ink:#16202E; --muted:#586476; --rule:#C7CFDB;
+  --hot:#C62F3E; --cold:#2B5BD7; --dot:#9DBB14;
+  --global:#6A45B8; --fixE:#0F8C80; --fixMu:#E07B00;
+  --ref:#8A94A3; --focus:#2B5BD7;
+  --serif:"Spectral", Georgia, "Times New Roman", serif;
+  --sans:"Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121822; --panel:#1B2330; --paper:#18202B; --ink:#E6EAF0; --muted:#98A3B3; --rule:#2F3A4A;
+    --hot:#F0616C; --cold:#6E95FF; --dot:#C3DE3A;
+    --global:#A98BFF; --fixE:#3CC6B6; --fixMu:#FFA640; --ref:#7B8595; --focus:#6E95FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121822; --panel:#1B2330; --paper:#18202B; --ink:#E6EAF0; --muted:#98A3B3; --rule:#2F3A4A;
+  --hot:#F0616C; --cold:#6E95FF; --dot:#C3DE3A;
+  --global:#A98BFF; --fixE:#3CC6B6; --fixMu:#FFA640; --ref:#7B8595; --focus:#6E95FF;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+i.m{font-family:var(--serif);font-style:italic;font-size:1.08em}
+sub{font-size:.72em}
+header{max-width:1280px;margin:0 auto;padding:36px 24px 20px}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,4.2vw,46px);line-height:1.08;margin:0 0 12px;letter-spacing:-.01em;max-width:22ch}
+.lede{font-family:var(--serif);font-size:18px;line-height:1.55;color:var(--muted);max-width:68ch;margin:0}
+.lede b{color:var(--ink);font-weight:600}
+.layout{max-width:1280px;margin:0 auto;padding:8px 24px 48px;display:grid;grid-template-columns:320px minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+aside{background:var(--panel);border-radius:14px;padding:18px 18px 20px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:900px){aside{position:static}}
+.schem{width:100%;height:auto;display:block;border-radius:10px;background:var(--paper)}
+.ctl{margin-top:16px}
+.ctl label,.ctl .lab{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:4px}
+.ctl output{font-variant-numeric:tabular-nums;font-weight:600}
+.ctl .hint{font-size:12.5px;color:var(--muted);margin-top:2px}
+input[type=range]{width:100%;accent-color:var(--ink);height:28px}
+.ctl.dim{opacity:.45}
+fieldset{border:0;margin:16px 0 0;padding:0}
+legend{font-size:14px;margin-bottom:6px;padding:0}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--paper);border-radius:10px;padding:3px;gap:3px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{text-align:center;font-size:13px;padding:8px 4px;border-radius:8px;cursor:pointer;line-height:1.2;color:var(--muted)}
+.seg input:checked+label{background:var(--ink);color:var(--paper);font-weight:600}
+.seg input:focus-visible+label{outline:2px solid var(--focus);outline-offset:2px}
+.readout{margin-top:18px;display:grid;grid-template-columns:1fr auto;gap:5px 12px;font-size:14px}
+.readout dt{color:var(--muted)}
+.readout dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.readout .big{font-family:var(--serif);font-size:30px;line-height:1;font-weight:400}
+.readout .sep{grid-column:1/-1;height:1px;background:var(--rule);margin:6px 0}
+main{min-width:0}
+figure{margin:0 0 28px}
+figcaption{font-size:14px;color:var(--muted);max-width:70ch;margin-top:8px}
+figcaption b{color:var(--ink);font-weight:600}
+.fighead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:8px}
+h2{font-family:var(--serif);font-weight:400;font-size:24px;margin:0;line-height:1.2}
+.plot{width:100%;display:block;background:var(--paper);border-radius:12px;touch-action:pan-y}
+.tall{aspect-ratio:16/9}
+.twin{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:700px){.twin{grid-template-columns:1fr}}
+.sq{aspect-ratio:5/4}
+.toggles{display:flex;gap:14px;flex-wrap:wrap;font-size:13.5px}
+.toggles label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.toggles input{accent-color:var(--ink)}
+.key{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;margin-top:8px;color:var(--muted)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key s{display:inline-block;width:18px;height:0;border-top:3px solid;text-decoration:none}
+.key s.dash{border-top-style:dashed;border-top-width:2px}
+.key s.dot{border-top-style:dotted;border-top-width:2px}
+article{max-width:70ch;font-family:var(--serif);font-size:17px;line-height:1.62}
+article h2{margin:8px 0 10px}
+article p{margin:0 0 14px}
+.eq{font-family:var(--serif);font-size:19px;text-align:center;margin:14px 0}
+.nlaw{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:18px;align-items:center;font-family:var(--sans);font-size:14px;margin:6px 0 18px;background:var(--panel);border-radius:12px;padding:14px}
+@media (max-width:600px){.nlaw{grid-template-columns:1fr}}
+.nlaw canvas{width:100%;aspect-ratio:3/2;background:var(--paper);border-radius:8px;display:block}
+.src{font-family:var(--sans);font-size:13px;color:var(--muted);margin-top:24px}
+.src+.src{margin-top:6px}
+a{color:var(--cold);text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Where does a quantum dot engine run best?</h1>
+  <p class="lede">A single-level dot between a hot lead and a cold lead turns heat into electrical work. Maximize its power and the efficiency usually lands at <b>half of Carnot</b>. Hold the bias fixed and tune only the gate, and it climbs to <b>almost all of Carnot</b>. Move the sliders to see why.</p>
+</header>
+
+<div class="layout">
+<aside aria-label="Engine controls">
+  <svg class="schem" id="schem" viewBox="0 0 300 200" role="img" aria-label="Energy diagram of the quantum dot engine at the current optimum"></svg>
+
+  <div class="ctl">
+    <label for="etaC"><span>Carnot efficiency <i class="m">η</i><sub>C</sub></span><output id="etaCv"></output></label>
+    <input id="etaC" type="range" min="0.02" max="0.95" step="0.005" value="0.30">
+    <div class="hint" id="tempHint"></div>
+  </div>
+
+  <fieldset>
+    <legend>Maximize power by tuning</legend>
+    <div class="seg">
+      <input type="radio" name="mode" id="mG" value="global" checked><label for="mG">Gate and bias</label>
+      <input type="radio" name="mode" id="mE" value="fixE"><label for="mE">Bias only</label>
+      <input type="radio" name="mode" id="mM" value="fixMu"><label for="mM">Gate only</label>
+    </div>
+  </fieldset>
+
+  <div class="ctl" id="ctlE">
+    <label for="Eqd"><span>Fixed dot level <i class="m">E</i><sub>QD</sub>/<i class="m">T</i><sub>2</sub></span><output id="Eqdv"></output></label>
+    <input id="Eqd" type="range" min="0.3" max="8" step="0.05" value="2">
+  </div>
+  <div class="ctl" id="ctlM">
+    <label for="dmu"><span>Fixed bias Δ<i class="m">μ</i>/<i class="m">T</i><sub>2</sub></span><output id="dmuv"></output></label>
+    <input id="dmu" type="range" min="0.2" max="4" step="0.05" value="1">
+  </div>
+
+  <dl class="readout" id="readout"></dl>
+</aside>
+
+<main>
+  <figure>
+    <div class="fighead">
+      <h2>Efficiency at maximum power</h2>
+      <div class="toggles">
+        <label><input type="checkbox" id="ratio"> Divide by <i class="m">η</i><sub>C</sub></label>
+        <label><input type="checkbox" id="series"> Small-<i class="m">η</i><sub>C</sub> expansions</label>
+      </div>
+    </div>
+    <canvas class="plot tall" id="pEff" aria-label="Efficiency at maximum power versus Carnot efficiency for three optimization schemes"></canvas>
+    <div class="key">
+      <span><s style="border-color:var(--global)"></s>Gate and bias, Eq. (18)</span>
+      <span><s style="border-color:var(--fixE)"></s>Bias only, Eq. (22)</span>
+      <span><s style="border-color:var(--fixMu)"></s>Gate only, Eq. (40)</span>
+      <span><s class="dash" style="border-color:var(--ink)"></s><i class="m">η</i><sub>C</sub></span>
+      <span><s class="dot" style="border-color:var(--ref)"></s><i class="m">η</i><sub>C</sub>/2</span>
+      <span><s style="border-color:var(--ref);border-top-width:1.5px"></s>Curzon–Ahlborn</span>
+    </div>
+    <figcaption>Near equilibrium the violet and teal curves leave the origin with slope ½, the textbook result for tightly coupled engines. The orange curve leaves with slope 1: with the bias pinned, the best gate setting sits almost at the reversible point.</figcaption>
+  </figure>
+
+  <div class="twin">
+    <figure>
+      <h2>Power landscape</h2>
+      <canvas class="plot sq" id="pMap" aria-label="Heat map of power over dot level and bias"></canvas>
+      <figcaption>Power over dot level <i class="m">E</i><sub>QD</sub> (across) and bias Δ<i class="m">μ</i> (up). The engine only runs below the diagonal Δ<i class="m">μ</i> = <i class="m">η</i><sub>C</sub><i class="m">E</i><sub>QD</sub>, where it becomes reversible. The line shows the slice you are allowed to move along.</figcaption>
+    </figure>
+    <figure>
+      <h2>Power along each slice</h2>
+      <canvas class="plot sq" id="pSlice" aria-label="Power versus efficiency along each constrained slice"></canvas>
+      <figcaption>Power against <i class="m">η</i>/<i class="m">η</i><sub>C</sub>, each curve scaled to its own peak. Tuning the bias gives a near-parabola peaking at ½. Tuning the gate gives a curve that stays flat near zero efficiency and peaks close to 1.</figcaption>
+    </figure>
+  </div>
+
+  <article>
+    <h2>Why the half-Carnot rule breaks</h2>
+    <p>Van den Broeck's argument assumes the work-producing flux grows linearly with its force as you leave the stall point. Power is flux times force, so it is a parabola between zero force and the reversible point, and the peak sits halfway, at <i>η</i><sub>C</sub>/2.</p>
+    <p>With the bias fixed, the natural force is 1/<i>E</i><sub>QD</sub>. Its zero, an infinitely high dot level, is not equilibrium: the current vanishes because the dot is simply out of reach, while the temperature difference is still there. Near that point the current dies like e<sup>−<i>E</i><sub>QD</sub>/<i>T</i><sub>2</sub></sup>, an essential singularity rather than a straight line. If the flux instead rises like <i>X</i><sup><i>n</i>+1</sup>, the peak moves to</p>
+    <p class="eq"><i>η</i><sub>op</sub> = <i>η</i><sub>C</sub> (<i>n</i> + 1)/(<i>n</i> + 2),</p>
+    <div class="nlaw">
+      <div>
+        <label for="nexp" style="display:flex;justify-content:space-between"><span>Order of the flux, <i class="m">n</i></span><output id="nv"></output></label>
+        <input id="nexp" type="range" min="0" max="30" step="1" value="0">
+        <p style="margin:6px 0 0">Peak at <i class="m">η</i>/<i class="m">η</i><sub>C</sub> = <b id="npk"></b>. <span id="nnote"></span></p>
+      </div>
+      <canvas id="pN" aria-label="Normalized power for a flux of order n"></canvas>
+    </div>
+    <p>An essential singularity is the limit <i>n</i> → ∞, which is why gate-only tuning approaches Carnot efficiency at maximum power. The price is output: at <i>η</i><sub>C</sub> ≈ 0.3 and Δ<i>μ</i> = <i>T</i><sub>2</sub> it delivers about 70% of the globally optimal power while running about 30% more efficiently, close to what Josefsson et al. measured.</p>
+    <p class="src">Based on Sang Hoon Lee, Jaegon Um and Hyunggyu Park, <a href="https://doi.org/10.1103/PhysRevE.98.052137">“Nonuniversality of heat-engine efficiency at maximum power,” Phys. Rev. E 98, 052137 (2018)</a>. Units: <i class="m">k</i><sub>B</sub> = 1, <i class="m">T</i><sub>2</sub> = 1, <i class="m">T</i><sub>1</sub> = <i class="m">T</i><sub>2</sub>/(1 − <i class="m">η</i><sub>C</sub>), tunnelling rates normalized to 1. All curves are computed numerically in your browser.</p>
+    <p class="src">Interactive demo created by Claude Opus 5.5 (Anthropic).</p>
+  </article>
+</main>
+</div>
+
+<script>
+/* ---------- model: W = ½(q−ε)Δμ, q = 1/(1+e^{E/T1}), ε = 1/(1+e^{(E−Δμ)/T2}) ---------- */
+const T2 = 1;
+const sp = x => x>0 ? x+Math.log1p(Math.exp(-x)) : Math.log1p(Math.exp(x));
+function logW(E,d,T1){ if(!(d>0)) return -Infinity; const lq=-sp(E/T1), le=-sp((E-d)/T2); if(le>=lq) return -Infinity; return lq+Math.log(-Math.expm1(le-lq))+Math.log(d)-Math.LN2; }
+function maximize(f,a,b,n,it){ let bi=0,bv=-Infinity; const xs=[]; for(let i=0;i<=n;i++){const x=a+(b-a)*i/n; xs.push(x); const v=f(x); if(v>bv){bv=v;bi=i;}}
+  let lo=xs[Math.max(0,bi-1)], hi=xs[Math.min(n,bi+1)]; const g=(Math.sqrt(5)-1)/2;
+  let c=hi-g*(hi-lo), d=lo+g*(hi-lo), fc=f(c), fd=f(d);
+  for(let i=0;i<it;i++){ if(fc>fd){hi=d;d=c;fd=fc;c=hi-g*(hi-lo);fc=f(c);} else {lo=c;c=d;fc=fd;d=lo+g*(hi-lo);fd=f(d);} }
+  const x=(lo+hi)/2; return {x,v:f(x)}; }
+function optFixedE(E,T1){ const eC=1-T2/T1; const r=maximize(d=>logW(E,d,T1),0,eC*E,40,45); return {E,d:r.x,lw:r.v,eta:r.x/E}; }
+function optFixedMu(d,T1){ const eC=1-T2/T1, Er=d/eC; const r=maximize(t=>logW(Er+T2*Math.exp(t),d,T1),Math.log(1e-4),Math.log(1e4),120,50); const E=Er+T2*Math.exp(r.x); return {E,d,lw:r.v,eta:d/E}; }
+function optGlobal(T1){ const r=maximize(t=>optFixedE(T1*Math.exp(t),T1).lw,Math.log(0.05),Math.log(60),50,40); return optFixedE(T1*Math.exp(r.x),T1); }
+const T1of = e => T2/(1-e);
+
+/* global curve is parameter-free: compute once */
+const EC = []; for(let i=1;i<=110;i++){ EC.push(0.995*i/110); }
+const globalCurve = EC.map(e=>optGlobal(T1of(e)).eta);
+
+/* ---------- state ---------- */
+const $ = id => document.getElementById(id);
+const S = { eC:.3, mode:'global', E:2, d:1, ratio:false, series:false, n:0 };
+let R = {};
+
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function fmt(x,p=3){ return (Math.abs(x)<1e-3&&x!==0)? x.toExponential(1) : x.toFixed(p); }
+
+function compute(){
+  const T1=T1of(S.eC);
+  const g=optGlobal(T1), fe=optFixedE(S.E,T1), fm=optFixedMu(S.d,T1);
+  R={T1,g,fe,fm, act: S.mode==='global'?g : S.mode==='fixE'?fe : fm};
+  R.curveE = EC.map(e=>optFixedE(S.E,T1of(e)).eta);
+  R.curveM = EC.map(e=>optFixedMu(S.d,T1of(e)).eta);
+}
+
+/* ---------- canvas helpers ---------- */
+function prep(c){ const dpr=window.devicePixelRatio||1, w=c.clientWidth, h=c.clientHeight;
+  if(c.width!==Math.round(w*dpr)||c.height!==Math.round(h*dpr)){c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);}
+  const x=c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,w,h); return {x,w,h}; }
+function frame(x,w,h,m,xr,yr,xt,yt,xl,yl){
+  const B={l:m.l,t:m.t,r:w-m.r,b:h-m.b}; const X=v=>B.l+(v-xr[0])/(xr[1]-xr[0])*(B.r-B.l), Y=v=>B.b-(v-yr[0])/(yr[1]-yr[0])*(B.b-B.t);
+  x.strokeStyle=css('--rule'); x.lineWidth=1; x.fillStyle=css('--muted'); x.font='12px '+css('--sans');
+  x.textAlign='center'; x.textBaseline='top';
+  xt.forEach(v=>{x.beginPath();x.moveTo(X(v),B.t);x.lineTo(X(v),B.b);x.globalAlpha=.5;x.stroke();x.globalAlpha=1;x.fillText(+v.toFixed(2),X(v),B.b+6);});
+  x.textAlign='right'; x.textBaseline='middle';
+  yt.forEach(v=>{x.beginPath();x.moveTo(B.l,Y(v));x.lineTo(B.r,Y(v));x.globalAlpha=.5;x.stroke();x.globalAlpha=1;x.fillText(+v.toFixed(2),B.l-6,Y(v));});
+  x.fillStyle=css('--ink'); x.font='italic 15px '+css('--serif');
+  x.textAlign='center'; x.textBaseline='bottom'; x.fillText(xl,(B.l+B.r)/2,h-4);
+  x.save(); x.translate(14,(B.t+B.b)/2); x.rotate(-Math.PI/2); x.textBaseline='middle'; x.fillText(yl,0,0); x.restore();
+  return {B,X,Y};
+}
+function line(x,X,Y,xs,ys,col,wd,dash){ x.beginPath(); let s=false; for(let i=0;i<xs.length;i++){ if(!isFinite(ys[i])){s=false;continue;} const px=X(xs[i]),py=Y(ys[i]); s?x.lineTo(px,py):x.moveTo(px,py); s=true; }
+  x.strokeStyle=col; x.lineWidth=wd; x.setLineDash(dash||[]); x.lineJoin='round'; x.stroke(); x.setLineDash([]); }
+function dot(x,px,py,col,r=5){ x.beginPath(); x.arc(px,py,r,0,7); x.fillStyle=col; x.fill(); x.lineWidth=2; x.strokeStyle=css('--paper'); x.stroke(); }
+const ticks=(a,b,n)=>{const o=[];for(let i=0;i<=n;i++)o.push(a+(b-a)*i/n);return o;};
+
+/* ---------- efficiency plot ---------- */
+function drawEff(){
+  const c=$('pEff'), {x,w,h}=prep(c);
+  const yr=[0,1], F=frame(x,w,h,{l:48,t:14,r:16,b:40},[0,1],yr,ticks(0,1,5),ticks(0,1,5),'η_C', S.ratio?'η_op / η_C':'η_op');
+  const {X,Y,B}=F; x.save(); x.beginPath(); x.rect(B.l,B.t,B.r-B.l,B.b-B.t); x.clip();
+  const tr=(e,v)=>S.ratio? v/e : v;
+  const xs=[0.001,...EC];
+  line(x,X,Y,xs,xs.map(e=>tr(e,e)),css('--ink'),1.5,[6,4]);
+  line(x,X,Y,xs,xs.map(e=>tr(e,e/2)),css('--ref'),1.5,[2,3]);
+  line(x,X,Y,xs,xs.map(e=>tr(e,1-Math.sqrt(1-e))),css('--ref'),1.2);
+  const cur=[['global',globalCurve,'--global'],['fixE',R.curveE,'--fixE'],['fixMu',R.curveM,'--fixMu']];
+  cur.forEach(([m,arr,col])=>{ line(x,X,Y,EC,arr.map((v,i)=>tr(EC[i],v)),css(col),m===S.mode?3.2:1.8); });
+  if(S.series){
+    const s={global:e=>e/2+e*e/8+0.077492*e**3, fixE:e=>e/2+S.E/(16*T2)*Math.tanh(S.E/(2*T2))*e*e, fixMu:e=>e-T2/S.d*e*e}[S.mode];
+    const col=css({global:'--global',fixE:'--fixE',fixMu:'--fixMu'}[S.mode]);
+    line(x,X,Y,xs,xs.map(e=>{const v=s(e);return v>=0&&v<=1.2?tr(e,v):NaN;}),col,1.6,[5,4]);
+  }
+  x.strokeStyle=css('--muted'); x.globalAlpha=.6; x.beginPath(); x.moveTo(X(S.eC),B.t); x.lineTo(X(S.eC),B.b); x.stroke(); x.globalAlpha=1;
+  dot(x,X(S.eC),Y(tr(S.eC,R.g.eta)),css('--global'),S.mode==='global'?6:4);
+  dot(x,X(S.eC),Y(tr(S.eC,R.fe.eta)),css('--fixE'),S.mode==='fixE'?6:4);
+  dot(x,X(S.eC),Y(tr(S.eC,R.fm.eta)),css('--fixMu'),S.mode==='fixMu'?6:4);
+  x.restore();
+}
+
+/* ---------- power landscape ---------- */
+function cmap(t){ // cool-to-hot ramp built from the lead colors
+  const st=[[0,[40,52,90]],[.35,[43,91,215]],[.65,[150,70,170]],[.85,[198,47,62]],[1,[255,196,90]]];
+  for(let i=1;i<st.length;i++) if(t<=st[i][0]){ const [a,ca]=st[i-1],[b,cb]=st[i],u=(t-a)/(b-a); return ca.map((v,k)=>Math.round(v+(cb[k]-v)*u)); }
+  return st[st.length-1][1]; }
+let mapCache={key:''};
+function drawMap(){
+  const c=$('pMap'), {x,w,h}=prep(c), T1=R.T1;
+  let Em=2.2*R.g.E; if(S.mode==='fixE') Em=Math.max(Em,1.25*S.E); if(S.mode==='fixMu') Em=Math.max(Em,1.35*R.fm.E); Em=Math.min(Em,80);
+  const Dm=S.eC*Em;
+  const nt=v=>{const s=Math.pow(10,Math.floor(Math.log10(v/4)));const m=[1,2,2.5,5,10].find(k=>v/(k*s)<=5);const st=m*s;return ticks(0,Math.floor(v/st)*st,Math.floor(v/st));};
+  const F=frame(x,w,h,{l:52,t:14,r:14,b:40},[0,Em],[0,Dm],nt(Em),nt(Dm),'E_QD / T₂','Δμ / T₂');
+  const {B,X,Y}=F, pw=Math.round(B.r-B.l), ph=Math.round(B.b-B.t);
+  const key=[S.eC,Em,pw,ph].join();
+  if(mapCache.key!==key){
+    const nx=Math.min(180,pw), ny=Math.min(150,ph), off=document.createElement('canvas'); off.width=nx; off.height=ny;
+    const oc=off.getContext('2d'), img=oc.createImageData(nx,ny), lwg=R.g.lw;
+    for(let j=0;j<ny;j++) for(let i=0;i<nx;i++){
+      const E=(i+.5)/nx*Em, d=(1-(j+.5)/ny)*Dm, lw=logW(E,d,T1), k=4*(j*nx+i);
+      if(!isFinite(lw)){ img.data[k+3]=0; continue; }
+      const t=Math.max(0,Math.min(1,Math.exp(lw-lwg))); const col=cmap(Math.pow(t,.6));
+      img.data[k]=col[0];img.data[k+1]=col[1];img.data[k+2]=col[2];img.data[k+3]=255;
+    }
+    oc.putImageData(img,0,0); mapCache={key,off};
+  }
+  x.imageSmoothingEnabled=true; x.drawImage(mapCache.off,B.l,B.t,pw,ph);
+  x.save(); x.beginPath(); x.rect(B.l,B.t,pw,ph); x.clip();
+  x.strokeStyle=css('--ink'); x.lineWidth=1.5; x.setLineDash([6,4]); x.beginPath(); x.moveTo(X(0),Y(0)); x.lineTo(X(Em),Y(Dm)); x.stroke(); x.setLineDash([]);
+  x.lineWidth=3;
+  if(S.mode==='fixE'){ x.strokeStyle='#fff'; x.beginPath(); x.moveTo(X(S.E),Y(0)); x.lineTo(X(S.E),Y(S.eC*S.E)); x.stroke(); }
+  if(S.mode==='fixMu'){ x.strokeStyle='#fff'; x.beginPath(); x.moveTo(X(S.d/S.eC),Y(S.d)); x.lineTo(X(Em),Y(S.d)); x.stroke(); }
+  dot(x,X(R.g.E),Y(R.g.d),css('--global'),S.mode==='global'?7:5);
+  if(S.mode==='fixE') dot(x,X(R.fe.E),Y(R.fe.d),css('--fixE'),7);
+  if(S.mode==='fixMu') dot(x,X(R.fm.E),Y(R.fm.d),css('--fixMu'),7);
+  x.restore();
+  x.fillStyle=css('--muted'); x.font='12px '+css('--sans'); x.textAlign='left'; x.textBaseline='top';
+  x.fillText('reversible edge',B.l+8,B.t+6);
+}
+
+/* ---------- slices ---------- */
+function drawSlice(){
+  const c=$('pSlice'), {x,w,h}=prep(c), T1=R.T1, eC=S.eC;
+  const F=frame(x,w,h,{l:44,t:14,r:14,b:40},[0,1],[0,1.05],ticks(0,1,4),ticks(0,1,4),'η / η_C','power / peak');
+  const {X,Y,B}=F, us=ticks(0.0005,0.9995,300);
+  const norm=a=>{const m=Math.max(...a.filter(isFinite));return a.map(v=>Math.exp(v-m));};
+  const sE=E=>norm(us.map(u=>logW(E,u*eC*E,T1)));
+  const sM=d=>norm(us.map(u=>logW(d/(u*eC),d,T1)));
+  const set=[['global',sE(R.g.E),'--global',R.g.eta],['fixE',sE(S.E),'--fixE',R.fe.eta],['fixMu',sM(S.d),'--fixMu',R.fm.eta]];
+  x.save(); x.beginPath(); x.rect(B.l,B.t,B.r-B.l,B.b-B.t); x.clip();
+  line(x,X,Y,[.5,.5],[0,1.05],css('--ref'),1,[2,3]);
+  set.forEach(([m,a,col])=>{ if(m!==S.mode) line(x,X,Y,us,a,css(col),1.6); });
+  set.forEach(([m,a,col,eta])=>{ if(m===S.mode){ line(x,X,Y,us,a,css(col),3.2); dot(x,X(eta/eC),Y(1),css(col),6);} });
+  x.restore();
+}
+
+/* ---------- n-law ---------- */
+function drawN(){
+  const c=$('pN'), {x,w,h}=prep(c), n=S.n, pk=(n+1)/(n+2);
+  const B={l:8,t:10,r:w-8,b:h-18}, X=u=>B.l+u*(B.r-B.l), Y=v=>B.b-v*(B.b-B.t);
+  const f=u=>(1-u)*Math.pow(u,n+1), m=f(pk); const us=ticks(0,1,200);
+  line(x,X,Y,[.5,.5],[0,1],css('--ref'),1,[2,3]);
+  line(x,X,Y,us,us.map(u=>f(u)/m),css('--fixMu'),2.5);
+  dot(x,X(pk),Y(1),css('--fixMu'),5);
+  x.fillStyle=css('--muted'); x.font='11px '+css('--sans'); x.textBaseline='top';
+  x.textAlign='left'; x.fillText('0',B.l,B.b+4); x.textAlign='right'; x.fillText('η/η_C = 1',B.r,B.b+4);
+  $('nv').textContent=n; $('npk').textContent=pk.toFixed(3);
+  $('nnote').textContent = n===0 ? 'n = 0 is linear response: the half-Carnot rule.' : n>=20 ? 'Already close to 1, like the gate-only engine.' : '';
+}
+
+/* ---------- schematic ---------- */
+const SV='http://www.w3.org/2000/svg';
+const schem=$('schem'); let electrons=[], schemGeom=null;
+function el(t,a,p){const e=document.createElementNS(SV,t);for(const k in a)e.setAttribute(k,a[k]);(p||schem).appendChild(e);return e;}
+function drawSchem(){
+  schem.innerHTML=''; const a=R.act, E=a.E, d=a.d;
+  const base=170, top=28, k=Math.min(30,(base-top)/Math.max(E,.5)*.92);
+  const yMu1=base, yMu2=base-k*d, yG=base-k*E;
+  const defs=el('defs',{});
+  const mk=(id,col,y,T)=>{ const g=el('linearGradient',{id,x1:0,y1:0,x2:0,y2:1,gradientUnits:'userSpaceOnUse'},defs); g.setAttribute('y1',y-Math.min(40,5*T)); g.setAttribute('y2',y+Math.min(40,5*T));
+    el('stop',{offset:0,'stop-color':col,'stop-opacity':0},g); el('stop',{offset:1,'stop-color':col,'stop-opacity':.85},g); };
+  mk('g1',css('--hot'),yMu1,R.T1); mk('g2',css('--cold'),yMu2,T2);
+  el('rect',{x:10,y:14,width:78,height:176,rx:8,fill:'none',stroke:css('--rule')});
+  el('rect',{x:212,y:14,width:78,height:176,rx:8,fill:'none',stroke:css('--rule')});
+  el('rect',{x:11,y:yMu1-45,width:76,height:190-(yMu1-45),fill:'url(#g1)'});
+  el('rect',{x:213,y:yMu2-45,width:76,height:190-(yMu2-45),fill:'url(#g2)'});
+  const tx=(x,y,s,anchor,col)=>{const t=el('text',{x,y,'font-size':12,'font-family':css('--sans'),fill:col||css('--ink'),'text-anchor':anchor||'middle'});t.textContent=s;return t;};
+  tx(49,30,'hot, T₁ = '+R.T1.toFixed(2)); tx(251,30,'cold, T₂ = 1');
+  el('line',{x1:11,x2:87,y1:yMu1,y2:yMu1,stroke:css('--hot'),'stroke-width':2});
+  el('line',{x1:213,x2:289,y1:yMu2,y2:yMu2,stroke:css('--cold'),'stroke-width':2});
+  tx(20,yMu1-5,'μ₁','start'); tx(280,yMu2-5,'μ₂','end');
+  el('ellipse',{cx:150,cy:yG,rx:38,ry:16,fill:css('--dot'),'fill-opacity':.28});
+  el('line',{x1:124,x2:176,y1:yG,y2:yG,stroke:css('--ink'),'stroke-width':2.5});
+  tx(150,yG-22,'dot level','middle',css('--muted'));
+  el('line',{x1:118,x2:118,y1:yMu1,y2:yG,stroke:css('--muted'),'stroke-dasharray':'2 3'});
+  el('line',{x1:182,x2:182,y1:yMu2,y2:yG,stroke:css('--muted'),'stroke-dasharray':'2 3'});
+  el('line',{x1:87,x2:118,y1:yMu1,y2:yMu1,stroke:css('--muted'),'stroke-dasharray':'2 3'});
+  el('line',{x1:182,x2:213,y1:yMu2,y2:yMu2,stroke:css('--muted'),'stroke-dasharray':'2 3'});
+  const tE=tx(112,(yMu1+yG)/2+4,'E_QD '+E.toFixed(2),'end',css('--muted')); tE.setAttribute('font-size',11);
+  const tM=tx(196,Math.min(186,(yMu1+yMu2)/2+18),'Δμ '+d.toFixed(2),'start',css('--muted')); tM.setAttribute('font-size',11);
+  el('line',{x1:196,x2:196,y1:yMu1,y2:yMu2,stroke:css('--fixMu'),'stroke-width':2});
+  const layer=el('g',{});
+  schemGeom={yMu1,yMu2,yG,layer}; electrons=[];
+}
+function Jrel(){ return Math.exp(R.act.lw - Math.log(R.act.d) - (R.g.lw - Math.log(R.g.d))); }
+const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+let last=0, spawnAcc=0;
+function tick(t){
+  const dt=Math.min(.05,(t-last)/1000||0); last=t;
+  if(schemGeom && !reduce.matches){
+    spawnAcc+=dt*2.2*Jrel(); while(spawnAcc>1){ spawnAcc-=1; electrons.push({s:0,c:el('circle',{r:4.5,fill:css('--ink')},schemGeom.layer)}); }
+    const {yMu1,yMu2,yG}=schemGeom;
+    electrons=electrons.filter(e=>{ e.s+=dt*.45; if(e.s>=1){e.c.remove();return false;}
+      const s=e.s; let px,py;
+      if(s<.35){const u=s/.35; px=70+u*(128-70); py=yMu1+(yG-yMu1)*u;}
+      else if(s<.65){const u=(s-.35)/.3; px=128+u*44; py=yG;}
+      else {const u=(s-.65)/.35; px=172+u*(232-172); py=yG+(yMu2-yG)*u;}
+      e.c.setAttribute('cx',px); e.c.setAttribute('cy',py); return true; });
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ---------- readout & wiring ---------- */
+function readout(){
+  const a=R.act, e=S.eC, ca=1-Math.sqrt(1-e), pr=Math.exp(a.lw-R.g.lw);
+  const name={global:'Gate and bias',fixE:'Bias only',fixMu:'Gate only'}[S.mode];
+  $('readout').innerHTML=
+   `<dt>η<sub>op</sub> (${name.toLowerCase()})</dt><dd class="big" style="color:var(${S.mode==='global'?'--global':S.mode==='fixE'?'--fixE':'--fixMu'})">${a.eta.toFixed(3)}</dd>
+    <dt>η<sub>op</sub> / η<sub>C</sub></dt><dd>${(a.eta/e).toFixed(3)}</dd>
+    <dt>Curzon–Ahlborn η<sub>CA</sub></dt><dd>${ca.toFixed(3)}</dd>
+    <dt>η<sub>op</sub> / η<sub>CA</sub></dt><dd>${(a.eta/ca).toFixed(2)}</dd>
+    <div class="sep"></div>
+    <dt>Optimal E<sub>QD</sub></dt><dd>${fmt(a.E,2)}</dd>
+    <dt>Optimal Δμ</dt><dd>${fmt(a.d,3)}</dd>
+    <dt>Max power</dt><dd>${Math.exp(a.lw).toExponential(2)}</dd>
+    <dt>Share of global max power</dt><dd>${(100*pr).toFixed(0)}%</dd>`;
+}
+function syncUI(){
+  $('etaCv').textContent=S.eC.toFixed(3); $('Eqdv').textContent=S.E.toFixed(2); $('dmuv').textContent=S.d.toFixed(2);
+  $('tempHint').textContent=`T₁ = ${R.T1.toFixed(2)} T₂`;
+  $('ctlE').classList.toggle('dim',S.mode!=='fixE'); $('ctlM').classList.toggle('dim',S.mode!=='fixMu');
+}
+let raf=0;
+function render(recompute=true){ if(recompute) compute(); syncUI(); readout(); drawEff(); drawMap(); drawSlice(); drawN(); drawSchem(); }
+function schedule(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(()=>render()); }
+$('etaC').addEventListener('input',e=>{S.eC=+e.target.value;schedule();});
+$('Eqd').addEventListener('input',e=>{S.E=+e.target.value;if(S.mode!=='fixE'){S.mode='fixE';$('mE').checked=true;}schedule();});
+$('dmu').addEventListener('input',e=>{S.d=+e.target.value;if(S.mode!=='fixMu'){S.mode='fixMu';$('mM').checked=true;}schedule();});
+document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',e=>{S.mode=e.target.value;schedule();}));
+$('ratio').addEventListener('change',e=>{S.ratio=e.target.checked;drawEff();});
+$('series').addEventListener('change',e=>{S.series=e.target.checked;drawEff();});
+$('nexp').addEventListener('input',e=>{S.n=+e.target.value;drawN();});
+new ResizeObserver(()=>{ mapCache.key=''; render(false); }).observe(document.querySelector('main'));
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{mapCache.key='';render(false);});
+render(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
