@@ -112,7 +112,7 @@ a{color:var(--cold);text-underline-offset:2px}
 
 <div class="layout">
 <aside aria-label="Engine controls">
-  <svg class="schem" id="schem" viewBox="0 0 300 200" role="img" aria-label="Energy diagram of the quantum dot engine with a live simulation of single-electron tunnelling"></svg>
+  <svg class="schem" id="schem" viewBox="0 0 300 200" role="img" aria-label="Energy diagram of the quantum dot engine with a live simulation of single-electron tunneling"></svg>
   <div class="simbar">
     <button type="button" id="play" aria-pressed="false">Pause</button>
     <div class="speed" role="group" aria-label="Simulation speed">
@@ -121,7 +121,7 @@ a{color:var(--cold);text-underline-offset:2px}
     <button type="button" id="rst">Reset</button>
   </div>
   <dl class="simstats" id="simstats" aria-live="off"></dl>
-  <p class="simnote">Every hop is one real tunnelling event, drawn from a stochastic simulation of the master equation, Eq. (2). The dot holds at most one electron. An electron <span style="color:var(--hot)">absorbs heat <i class="m">Q</i><sub>1</sub> = <i class="m">E</i><sub>QD</sub></span> to climb out of the hot lead. On entering the cold lead it <span style="color:var(--cold)">sheds <i class="m">Q</i><sub>2</sub> = <i class="m">E</i><sub>QD</sub> − Δ<i class="m">μ</i></span>. The difference, <span style="color:var(--fixMu)"><i class="m">W</i> = Δ<i class="m">μ</i></span>, is the work. Backward hops happen too; only the net flow does work. At 1×, one second of animation is six tunnelling times 1/Γ.</p>
+  <p class="simnote">Every hop is one real tunneling event, drawn from a stochastic simulation of the master equation, Eq. (2). The dot holds at most one electron. An electron <span style="color:var(--hot)">absorbs heat <i class="m">Q</i><sub>1</sub> = <i class="m">E</i><sub>QD</sub></span> to climb out of the hot lead. On entering the cold lead it <span style="color:var(--cold)">sheds <i class="m">Q</i><sub>2</sub> = <i class="m">E</i><sub>QD</sub> − Δ<i class="m">μ</i></span>. The difference, <span style="color:var(--fixMu)"><i class="m">W</i> = Δ<i class="m">μ</i></span>, is the work. Backward hops happen too; only the net flow does work. At 1×, one second of animation is six tunneling times 1/Γ.</p>
 
   <div class="ctl">
     <label for="etaC"><span>Carnot efficiency <i class="m">η</i><sub>C</sub></span><output id="etaCv"></output></label>
@@ -198,7 +198,7 @@ a{color:var(--cold);text-underline-offset:2px}
       <canvas id="pN" aria-label="Normalized power for a flux of order n"></canvas>
     </div>
     <p>An essential singularity is the limit <i>n</i> → ∞, which is why gate-only tuning approaches Carnot efficiency at maximum power. The price is output: at <i>η</i><sub>C</sub> ≈ 0.3 and Δ<i>μ</i> = <i>T</i><sub>2</sub> it delivers about 70% of the globally optimal power while running about 30% more efficiently, close to what Josefsson et al. measured.</p>
-    <p class="src">Based on Sang Hoon Lee, Jaegon Um and Hyunggyu Park, <a href="https://doi.org/10.1103/PhysRevE.98.052137">“Nonuniversality of heat-engine efficiency at maximum power,” Phys. Rev. E 98, 052137 (2018)</a>. Units: <i class="m">k</i><sub>B</sub> = 1, <i class="m">T</i><sub>2</sub> = 1, <i class="m">T</i><sub>1</sub> = <i class="m">T</i><sub>2</sub>/(1 − <i class="m">η</i><sub>C</sub>), tunnelling rates normalized to 1. All curves are computed numerically in your browser.</p>
+    <p class="src">Based on Sang Hoon Lee, Jaegon Um and Hyunggyu Park, <a href="https://doi.org/10.1103/PhysRevE.98.052137">“Nonuniversality of heat-engine efficiency at maximum power,” Phys. Rev. E 98, 052137 (2018)</a>. Units: <i class="m">k</i><sub>B</sub> = 1, <i class="m">T</i><sub>2</sub> = 1, <i class="m">T</i><sub>1</sub> = <i class="m">T</i><sub>2</sub>/(1 − <i class="m">η</i><sub>C</sub>), tunneling rates normalized to 1. All curves are computed numerically in your browser.</p>
     <p class="src">Interactive demo created by Claude Opus 5.5 (Anthropic).</p>
   </article>
 </main>
@@ -371,7 +371,7 @@ function drawN(){
 /* ---------- schematic + live single-electron simulation ---------- */
 const SV='http://www.w3.org/2000/svg';
 const schem=$('schem'); let electrons=[], G=null, sim=null, simKey='';
-const SIM={paused:false, speed:1, base:6}; // base: tunnelling times (1/Γ) per real second at 1×
+const SIM={paused:false, speed:1, base:6}; // base: tunneling times (1/Γ) per real second at 1×
 function el(t,a,p){const e=document.createElementNS(SV,t);for(const k in a)e.setAttribute(k,a[k]);(p||schem).appendChild(e);return e;}
 function tx(x,y,s,anchor,col,size){const t=el('text',{x,y,'font-size':size||12,'font-family':css('--sans'),fill:col||css('--ink'),'text-anchor':anchor||'middle'});
   let wasSub=false;
@@ -432,7 +432,7 @@ function hop(){
   G.occ.setAttribute('opacity',sim.occ?1:0);
 }
 function spawn(kind){ if(reduce.matches||electrons.length>28) return; electrons.push({kind,s:0,c:el('circle',{r:4.5},G.layer)}); }
-// path of one hop: tunnelling is elastic (horizontal, at the dot energy); climbing to or relaxing from the dot energy is the heat exchange with a lead
+// path of one hop: tunneling is elastic (horizontal, at the dot energy); climbing to or relaxing from the dot energy is the heat exchange with a lead
 function place(e){
   const {yMu1,yMu2,yG}=G, s=e.s, hot=css('--hot'), cold=css('--cold'), ink=css('--ink');
   const lerp=(a,b,u)=>a+(b-a)*u; let x,y,col;
